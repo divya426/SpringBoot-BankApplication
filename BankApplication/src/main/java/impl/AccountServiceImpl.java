@@ -29,4 +29,22 @@ public class AccountServiceImpl implements IAccountService {
 		return AccountMapper.mapToAccountDto(savedAccount);
 	}
 
+	@Override
+	public AccountDto getAccount(Long id) {
+		Account account=accRepo.findById(id).orElseThrow(() -> new IllegalArgumentException("Account does not exist"));
+		return AccountMapper.mapToAccountDto(account);
+	}
+
+	
+	@Override
+	public AccountDto deposit(Long id, Double amount) {
+		
+		Account account= accRepo.findById(id).orElseThrow(() -> new IllegalArgumentException("Account does not exist"));
+
+		Double newAmount= account.getBalance()+amount;
+		account.setBalance(newAmount);
+		 Account savedAccount = accRepo.save(account);
+		return AccountMapper.mapToAccountDto(account);
+	}
+
 }
