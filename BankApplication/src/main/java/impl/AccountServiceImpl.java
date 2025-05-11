@@ -1,5 +1,8 @@
 package impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -47,4 +50,41 @@ public class AccountServiceImpl implements IAccountService {
 		return AccountMapper.mapToAccountDto(account);
 	}
 
+	@Override
+	public AccountDto withdraw(Long id, Double amount) {
+		Account account= accRepo.findById(id).orElseThrow(() -> new IllegalArgumentException("Account does not exist"));
+		
+		if(account.getBalance()<amount) {
+			throw new RuntimeException("Insufficient amount");
+		}
+		else {
+			Double newAmount= account.getBalance()-amount; 
+			account.setBalance(newAmount);
+			Account savedAccount = accRepo.save(account);
+		}
+		
+		 
+		return AccountMapper.mapToAccountDto(account);
+		
+	}
+
+	@Override
+	public List<AccountDto> getAllAccount() {
+		List<Account> allAccounts= accRepo.findAll();
+		List<AccountDto> allAccountDto= new ArrayList<AccountDto>();
+		allAccounts.forEach(account ->{
+		AccountDto accountDto=	AccountMapper.mapToAccountDto(account);
+			allAccountDto.add(accountDto);
+		});
+		return allAccountDto;
+	}
+
+	@Override
+	public void deleteAccount(Long id) {
+		Account account= accRepo.findById(id).orElseThrow(() -> new IllegalArgumentException("Account does not exist"));
+	 accRepo.deleteById(id);
+			
+	}
+
+	
 }
